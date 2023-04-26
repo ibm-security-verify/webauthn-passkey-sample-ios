@@ -15,7 +15,7 @@ The resource links in the prerequisites explain and demonstrate how you create a
 ## Getting started
 1. Open Terminal and clone the repository and open the project file in Xcode.
    ```
-   git clone git@github.com:ibm-security-verify/webauthn-passkey-sample-ios.git
+   git clone https://github.com/ibm-security-verify/webauthn-passkey-sample-ios.git
    xed .
    ```
 
