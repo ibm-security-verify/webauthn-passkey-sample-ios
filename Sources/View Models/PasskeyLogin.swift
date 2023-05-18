@@ -22,14 +22,10 @@ class PasskeyLogin: NSObject, ObservableObject {
     
     @MainActor
     func passwordless() async {
-        let result: FIDO2Challenge
-        var challenge = String()
+        let result: CredentialAssertionOptions
         
         do {
             result = try await fetchAssertionChallenge()
-            // The challenge needs to be Base64Url encoded, because rawClientDataJSON will do this.  Otherwise your FIDO server won't match the challenges.
-            challenge = result.challenge.base64UrlEncodedStringWithPadding
-            print("Attestation challenge: \(challenge)")
         }
         catch let error {
             self.errorMessage = error.localizedDescription
@@ -38,7 +34,7 @@ class PasskeyLogin: NSObject, ObservableObject {
         }
     
         let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingParty)
-        let request = provider.createCredentialAssertionRequest(challenge: Data(base64Encoded: challenge)!)
+        let request = provider.createCredentialAssertionRequest(challenge: result.challenge)
         
         let controller = ASAuthorizationController(authorizationRequests: [request])
         controller.delegate = self
@@ -54,9 +50,8 @@ class PasskeyLogin: NSObject, ObservableObject {
         self.isReset = true
     }
     
-    func fetchAssertionChallenge() async throws -> FIDO2Challenge {
-        let result = try await client.challenge(type: .assertion)
-        return result
+    func fetchAssertionChallenge() async throws -> CredentialAssertionOptions {
+        return try await client.challenge()
     }
     
     func createAssertion(assertion: ASAuthorizationPlatformPublicKeyCredentialAssertion) async throws {

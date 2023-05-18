@@ -21,16 +21,10 @@ class Register: NSObject, ObservableObject {
     
     @MainActor
     func register() async {
-        let result: FIDO2Challenge
-        var challenge = String()
-        
+        let result: CredentialRegistrationOptions
         do {
             result = try await fetchAttestationChallenge()
-            // The challenge needs to be Base64Url encoded, otherwise your FIDO server won't match the challenge.
-            challenge = result.challenge.base64UrlEncodedStringWithPadding
-            print("Attestation challenge: \(challenge)")
-            
-            self.displayName = result.displayName!
+            self.displayName = result.user.displayName
         }
         catch let error {
             self.errorMessage = error.localizedDescription
@@ -38,29 +32,23 @@ class Register: NSObject, ObservableObject {
             return
         }
         
-        // Convert the result.userId to Base64 URL encoded.
-        let userIdBase64UrlEncoded = result.userId!.base64UrlEncodedStringWithPadding
-        
-        // Convert the userIdBase64UrlEncoded to a hex value represented as a String.
-        let userIdData = Data(base64Encoded: userIdBase64UrlEncoded)!
-        let userId = userIdData.map { String(format: "%02hhx", $0) }.joined()
-        
-        print("UserID hex encoded: \(userId)")
+        print("UserID hex encoded: \(result.user.id.map { String(format: "%02hhx", $0) }.joined())")
         
         let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingParty)
-        let request = provider.createCredentialRegistrationRequest(challenge: Data(base64Encoded: challenge)!, name: result.name!, userID: userIdData)
+        let request = provider.createCredentialRegistrationRequest(challenge: result.challenge, name: result.user.name, userID: result.user.id)
+        
         let controller = ASAuthorizationController(authorizationRequests: [request])
         controller.delegate = self
         controller.presentationContextProvider = self
         controller.performRequests()
     }
     
-    func fetchAttestationChallenge() async throws -> FIDO2Challenge {
+    func fetchAttestationChallenge() async throws -> CredentialRegistrationOptions {
         guard let token = Login.fetchTokenInfo(token: token) else {
             throw "Invalid access token."
         }
         
-        return try await client.challenge(type: .attestation, displayName: self.nickname, token: token)
+        return try await client.challenge(displayName: self.nickname, token: token)
     }
     
     func createCredential(registration: ASAuthorizationPlatformPublicKeyCredentialRegistration) async throws {
