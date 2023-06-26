@@ -57,7 +57,7 @@ class PasskeyLogin: NSObject, ObservableObject {
     func createAssertion(assertion: ASAuthorizationPlatformPublicKeyCredentialAssertion) async throws {
         print("Assertion\n\(String(decoding: assertion.rawClientDataJSON, as: UTF8.self))")
         
-        let result = try await client.signin(signature: assertion.signature,
+        let result: Token = try await client.signin(signature: assertion.signature,
                                              clientDataJSON: assertion.rawClientDataJSON,
                                              authenticatorData: assertion.rawAuthenticatorData,
                                              credentialId: assertion.credentialID,
