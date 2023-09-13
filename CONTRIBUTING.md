@@ -7,7 +7,7 @@ This SDK follows coding style based on [API Design Guidelines](https://swift.org
 
 ## Issues and Questions
 
-If you encounter an issue, have a question or want to suggest an enhancement to the IBM Security Verify Passkey Sample App for iOS, you are welcome to submit a [request](https://github.com/ibm-security-verify/webauthn-passkey-sample-ios/issues).
+If you encounter an issue, have a question or want to suggest an enhancement to the IBM Security Verify Sample App for Passkey on iOS, you are welcome to submit a [request](https://github.com/ibm-security-verify/webauthn-passkey-sample-ios/issues).
 Before that, please search for similar issues. It's possible somebody has encountered this issue already.
 
 ## Pull Requests
