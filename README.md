@@ -1,4 +1,4 @@
-# IBM Security Verify Passkey Sample App project
+# IBM Security Verify Sample App for Passkey on iOS
 
 An implementation of Apple Passkeys with IBM Security Verify as the relying party FIDO service.
 
